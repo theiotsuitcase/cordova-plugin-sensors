@@ -27,7 +27,7 @@ public class Sensors extends CordovaPlugin implements SensorEventListener {
     long lastAccessTime;                // time the value was last retrieved
 
     JSONArray value;
-    String TYPE_SENSOR;
+    int TYPE_SENSOR;
 
     private SensorManager sensorManager;// Sensor manager
     Sensor mSensor;                     // Compass sensor returned by sensor manager
@@ -39,7 +39,7 @@ public class Sensors extends CordovaPlugin implements SensorEventListener {
      */
     public Sensors() {
         this.value = new JSONArray();
-        this.TYPE_SENSOR = "";
+        this.TYPE_SENSOR = 0;
         this.timeStamp = 0;
         this.setStatus(Sensors.STOPPED);
     }
@@ -68,7 +68,7 @@ public class Sensors extends CordovaPlugin implements SensorEventListener {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         
         if (action.equals("start")) {
-            this.TYPE_SENSOR = args.getString(0);
+            this.TYPE_SENSOR = args.getInt(0);
             this.start();
         }
         else if (action.equals("stop")) {
@@ -131,48 +131,8 @@ public class Sensors extends CordovaPlugin implements SensorEventListener {
         // Get proximity sensor from sensor manager
         @SuppressWarnings("deprecation")
         List<Sensor> list = new ArrayList<Sensor>();
-        if(this.TYPE_SENSOR.equals("PROXIMITY")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_PROXIMITY);
-        } else if(this.TYPE_SENSOR.equals("ACCELEROMETER")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        } else if(this.TYPE_SENSOR.equals("GRAVITY")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_GRAVITY);
-        } else if(this.TYPE_SENSOR.equals("GYROSCOPE")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE);
-        } else if(this.TYPE_SENSOR.equals("GYROSCOPE_UNCALIBRATED")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE_UNCALIBRATED);
-        } else if(this.TYPE_SENSOR.equals("LINEAR_ACCELERATION")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_LINEAR_ACCELERATION);
-        } else if(this.TYPE_SENSOR.equals("ROTATION_VECTOR")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR);
-        } else if(this.TYPE_SENSOR.equals("SIGNIFICANT_MOTION")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_SIGNIFICANT_MOTION);
-        } else if(this.TYPE_SENSOR.equals("STEP_COUNTER")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_STEP_COUNTER);
-        } else if(this.TYPE_SENSOR.equals("STEP_DETECTOR")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_STEP_DETECTOR);
-        } else if(this.TYPE_SENSOR.equals("GAME_ROTATION_VECTOR")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_GAME_ROTATION_VECTOR);
-        } else if(this.TYPE_SENSOR.equals("GEOMAGNETIC_ROTATION_VECTOR")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
-        } else if(this.TYPE_SENSOR.equals("MAGNETIC_FIELD")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
-        } else if(this.TYPE_SENSOR.equals("MAGNETIC_FIELD_UNCALIBRATED")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED);
-        } else if(this.TYPE_SENSOR.equals("ORIENTATION")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
-        } else if(this.TYPE_SENSOR.equals("AMBIENT_TEMPERATURE")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_AMBIENT_TEMPERATURE);
-        } else if(this.TYPE_SENSOR.equals("LIGHT")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_LIGHT);
-        } else if(this.TYPE_SENSOR.equals("PRESSURE")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_PRESSURE);
-        } else if(this.TYPE_SENSOR.equals("RELATIVE_HUMIDITY")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_RELATIVE_HUMIDITY);
-        } else if(this.TYPE_SENSOR.equals("TEMPERATURE")){
-            list = this.sensorManager.getSensorList(Sensor.TYPE_TEMPERATURE);
-        }
-
+        list = this.sensorManager.getSensorList(this.TYPE_SENSOR);
+        
         // If found, then register as listener
         if (list != null && list.size() > 0) {
             this.mSensor = list.get(0);
@@ -221,9 +181,7 @@ public class Sensors extends CordovaPlugin implements SensorEventListener {
         try {
             JSONArray value = new JSONArray();
             for(int i=0;i<event.values.length;i++){
-                
-                    value.put(Float.parseFloat(event.values[i]+""));
-                
+                value.put(Float.parseFloat(event.values[i]+""));
             }
 
             this.timeStamp = System.currentTimeMillis();
@@ -257,7 +215,6 @@ public class Sensors extends CordovaPlugin implements SensorEventListener {
         this.lastAccessTime = System.currentTimeMillis();
         return this.value;
     }
-
 
     /**
      * Set the timeout to turn off sensor if getValue() hasn't been called.
