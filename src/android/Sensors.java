@@ -1,4 +1,4 @@
-package com.fabiorogeriosj.plugin;
+package com.theiotsuitcase.plugin;
 
 import java.util.List;
 import org.apache.cordova.*;
